@@ -8,10 +8,12 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "symfony/console": "5.2.*",
+        "symfony/discord-notifier": "5.2.*",
         "symfony/dotenv": "5.2.*",
         "symfony/flex": "^1.3.1",
         "symfony/framework-bundle": "5.2.*",
         "symfony/http-client": "5.2.*",
+        "symfony/notifier": "5.2.*",
         "symfony/yaml": "5.2.*"
     },
     "require-dev": {
