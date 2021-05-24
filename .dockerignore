@@ -1,0 +1,15 @@
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/tests/
+/var/
+/vendor/
+
+.phpunit
+.phpunit.result.cache
+/phpunit.xml
+
+/phpunit.xml
+.phpunit.result.cache
