@@ -6,6 +6,7 @@ namespace App\Command;
 
 use App\Product\Asin;
 use App\Product\Product;
+use App\Product\ProductRepository;
 use App\Retailer\AmazonRetailer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,6 +18,7 @@ use Symfony\Component\Notifier\Recipient\NoRecipient;
 class RunCommand extends Command
 {
 	public function __construct(
+	    private ProductRepository $productRepository,
 		private AmazonRetailer $amazonRetailer,
 		private NotifierInterface $notifier
 	)
@@ -33,19 +35,18 @@ class RunCommand extends Command
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		// $product = new Product('Playstation 5 digital', new Asin('B08H93ZRK9'));
-		$product = new Product('Xbox Series S', new Asin('B087VM5XC6'));
+	    foreach ($this->productRepository->all() as $product) {
+            if (($inStock = $this->amazonRetailer->checkStock($product))->isInStock()) {
+                $notification = (new Notification)
+                    ->subject(sprintf('New Stock! "%s" is in stock again. Link: "%s"', $product->getName(), $inStock->getShopUrl()))
+                    ->channels(['chat/discord']);
 
-		if (($inStock = $this->amazonRetailer->checkStock($product))->isInStock()) {
-			$notification = (new Notification)
-				->subject(sprintf('New Stock! "%s" is in stock again. Link: "%s"', $product->getName(), $inStock->getShopUrl()))
-				->channels(['chat/discord']);
-
-			$this->notifier->send(
-				$notification,
-				new NoRecipient()
-			);
-		}
+                $this->notifier->send(
+                    $notification,
+                    new NoRecipient()
+                );
+            }
+        }
 
 		return 0;
 	}
