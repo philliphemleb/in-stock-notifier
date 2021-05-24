@@ -4,10 +4,9 @@ declare(strict_types=1);
 namespace App\Command;
 
 
-use App\Product\Asin;
-use App\Product\Product;
 use App\Product\ProductRepository;
 use App\Retailer\AmazonRetailer;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,7 +19,8 @@ class RunCommand extends Command
 	public function __construct(
 	    private ProductRepository $productRepository,
 		private AmazonRetailer $amazonRetailer,
-		private NotifierInterface $notifier
+		private NotifierInterface $notifier,
+        private LoggerInterface $logger
 	)
 	{
 		parent::__construct();
@@ -36,9 +36,13 @@ class RunCommand extends Command
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 	    foreach ($this->productRepository->all() as $product) {
-            if (($inStock = $this->amazonRetailer->checkStock($product))->isInStock()) {
+	        $this->logger->info('Checking stock for product '. $product->getName());
+
+            $checkResult = $this->amazonRetailer->checkStock($product);
+            if ($checkResult->isInStock()) {
+                $this->logger->info('Product '. $product->getName() .' is in stock!');
                 $notification = (new Notification)
-                    ->subject(sprintf('New Stock! "%s" is in stock again. Link: "%s"', $product->getName(), $inStock->getShopUrl()))
+                    ->subject(sprintf('New Stock! "%s" is in stock again. Link: "%s"', $product->getName(), $checkResult->getShopUrl()))
                     ->channels(['chat/discord']);
 
                 $this->notifier->send(
