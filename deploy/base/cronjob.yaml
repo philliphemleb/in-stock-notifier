@@ -13,3 +13,4 @@ spec:
               image: docker.pkg.github.com/philliphemleb/in-stock-notifier/in-stock-notifier:latest
               imagePullPolicy: Always
           restartPolicy: OnFailure
+          imagePullSecrets: []

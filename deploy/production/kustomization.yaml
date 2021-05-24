@@ -4,3 +4,14 @@ kind: Kustomization
 resources:
   - ../base
 
+patchesJson6902:
+  - target:
+      group: batch
+      version: v1beta1
+      kind: CronJob
+      name: in-stock-notifier
+    patch: |-
+      - op: add
+        path: /spec/jobTemplate/spec/template/spec/imagePullSecrets/-
+        value:
+          name: github-registry-philliphemleb
