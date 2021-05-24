@@ -1,4 +1,6 @@
 {
+    "name": "philliphemleb/in-stock-notifier",
+    "description": "in-stock-notifier is an application that periodically checks retailers for next gen consoles and sends notifications through various communications channels.",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "dev",
