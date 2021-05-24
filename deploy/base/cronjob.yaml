@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: in-stock-notifier
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: service
+              image: docker.pkg.github.com/philliphemleb/in-stock-notifier/in-stock-notifier:latest
+              imagePullPolicy: Always
+          restartPolicy: OnFailure
