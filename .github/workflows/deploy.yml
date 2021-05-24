@@ -27,10 +27,13 @@ jobs:
           command: |
             echo "Setup kubectl context"
             echo "$KUBERNETES_CERTIFICATE_AUTHORITY" > .ca.crt
-            kubectl config set-cluster "cluster" --server="https://95.111.246.105:6443" --certificate-authority=.ca.crt
+            kubectl config set-cluster "cluster" --server="https://95.111.246.105:6443" --certificate-authority=.ca.crt --embed-certs=true
             kubectl config set-credentials "user" --token="${KUBERNETES_SERVICEACCOUNT_TOKEN}"
             kubectl config set-context "cluster" --cluster="cluster" --user="user" --namespace="in-stock-notifier-app"
             kubectl config use-context "cluster"
+
+            echo "Test cluster connection"
+            kubectl version
             
             echo "Compile manifest with kustomize"
             kustomize build deploy/production > deploy/production/manifest.yaml
