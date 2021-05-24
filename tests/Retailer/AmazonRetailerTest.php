@@ -22,7 +22,7 @@ class AmazonRetailerTest extends TestCase
 
 		$isInStock = $amazonRetailer->checkStock($product);
 
-		$this->assertFalse($isInStock);
+		$this->assertFalse($isInStock->isInStock());
 		$this->assertSame(1, $client->getRequestsCount());
 	}
 
@@ -36,7 +36,7 @@ class AmazonRetailerTest extends TestCase
 
 		$isInStock = $amazonRetailer->checkStock($product);
 
-		$this->assertTrue($isInStock);
+		$this->assertTrue($isInStock->isInStock());
 		$this->assertSame(1, $client->getRequestsCount());
 	}
 }
