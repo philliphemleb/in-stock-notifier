@@ -8,5 +8,9 @@ use App\Product\Product;
 
 interface RetailerInterface
 {
-    public function isInStock(Product $product): bool;
+	/**
+	 * Returns retailer name. Used for notifications
+	 */
+	public function identifier(): string;
+    public function checkStock(Product $product): StockCheckResult;
 }

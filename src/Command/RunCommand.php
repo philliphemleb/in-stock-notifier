@@ -33,11 +33,12 @@ class RunCommand extends Command
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		$product = new Product('Playstation 5', new Asin('B08H93ZRK9'));
+		// $product = new Product('Playstation 5 digital', new Asin('B08H93ZRK9'));
+		$product = new Product('Xbox Series S', new Asin('B087VM5XC6'));
 
-		if ($this->amazonRetailer->isInStock($product)) {
+		if (($inStock = $this->amazonRetailer->checkStock($product))->isInStock()) {
 			$notification = (new Notification)
-				->subject(sprintf('New Stock! "%s" is in stock again.', $product->getName()))
+				->subject(sprintf('New Stock! "%s" is in stock again. Link: "%s"', $product->getName(), $inStock->getShopUrl()))
 				->channels(['chat/discord']);
 
 			$this->notifier->send(

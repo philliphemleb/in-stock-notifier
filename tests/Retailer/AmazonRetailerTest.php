@@ -20,7 +20,7 @@ class AmazonRetailerTest extends TestCase
 		$amazonRetailer = new AmazonRetailer($client);
 		$product = new Product('Playstation 5', new Asin('B08H93ZRK9'));
 
-		$isInStock = $amazonRetailer->isInStock($product);
+		$isInStock = $amazonRetailer->checkStock($product);
 
 		$this->assertFalse($isInStock);
 		$this->assertSame(1, $client->getRequestsCount());
@@ -34,7 +34,7 @@ class AmazonRetailerTest extends TestCase
 		$amazonRetailer = new AmazonRetailer($client);
 		$product = new Product('xBox Series S', new Asin('B087VM5XC6'));
 
-		$isInStock = $amazonRetailer->isInStock($product);
+		$isInStock = $amazonRetailer->checkStock($product);
 
 		$this->assertTrue($isInStock);
 		$this->assertSame(1, $client->getRequestsCount());
