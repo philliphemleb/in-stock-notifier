@@ -42,7 +42,7 @@ class RunCommand extends Command
             if ($checkResult->isInStock()) {
                 $this->logger->info('Product '. $product->getName() .' is in stock!');
                 $notification = (new Notification)
-                    ->subject(sprintf('New Stock! "%s" is in stock again. Link: "%s"', $product->getName(), $checkResult->getShopUrl()))
+                    ->subject(sprintf('New Stock! "%s" is in stock again. (%s)-Link: "%s"', $product->getName(), $checkResult->getRetailer()->identifier(), $checkResult->getShopUrl()))
                     ->channels(['chat/discord']);
 
                 $this->notifier->send(
