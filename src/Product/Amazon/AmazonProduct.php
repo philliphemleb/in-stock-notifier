@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Product\Amazon;
 
+use App\Product\IdentifierInterface;
 use App\Product\ProductInterface;
 
 class AmazonProduct implements ProductInterface
@@ -19,7 +20,7 @@ class AmazonProduct implements ProductInterface
         return $this->name;
     }
 
-    public function getAsin(): AmazonIdentifier
+    public function getIdentifier(): IdentifierInterface
     {
         return $this->asin;
     }
