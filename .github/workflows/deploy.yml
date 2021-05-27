@@ -16,6 +16,8 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    environment: Production
+
     steps:
       - uses: actions/checkout@v2
 
@@ -28,14 +30,14 @@ jobs:
           # command to run
           command: |
             echo "Setup kubectl context"
-            export KUBECONFIG="$(pwd)/kubeconfig"
             echo "$KUBERNETES_CERTIFICATE_AUTHORITY" > .ca.crt
             kubectl config set-cluster "cluster" --server="https://95.111.246.105:6443" --certificate-authority=.ca.crt --embed-certs=true
             kubectl config set-credentials "user" --token="${KUBERNETES_SERVICEACCOUNT_TOKEN}"
             kubectl config set-context "cluster" --cluster="cluster" --user="user" --namespace="in-stock-notifier-app"
             kubectl config use-context "cluster"
 
-            cat $KUBECONFIG
+            cat ~/.kube/config
+            printenv
 
             echo "Test cluster connection"
             kubectl version -v 4
