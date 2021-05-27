@@ -10,7 +10,7 @@ spec:
         spec:
           containers:
             - name: service
-              image: docker.pkg.github.com/philliphemleb/in-stock-notifier/in-stock-notifier:latest
+              image: ghcr.io/philliphemleb/in-stock-notifier/in-stock-notifier:latest
               imagePullPolicy: Always
           restartPolicy: OnFailure
           imagePullSecrets: []
