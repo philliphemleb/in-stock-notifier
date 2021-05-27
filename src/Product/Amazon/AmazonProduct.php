@@ -1,13 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Product;
+namespace App\Product\Amazon;
 
-class Product
+use App\Product\ProductInterface;
+
+class AmazonProduct implements ProductInterface
 {
     public function __construct(
         private string $name,
-        private Asin $asin
+        private AmazonIdentifier $asin
     )
     {
     }
@@ -17,7 +19,7 @@ class Product
         return $this->name;
     }
 
-    public function getAsin(): Asin
+    public function getAsin(): AmazonIdentifier
     {
         return $this->asin;
     }

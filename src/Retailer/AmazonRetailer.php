@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Retailer;
 
 
-use App\Product\Product;
+use App\Product\ProductInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AmazonRetailer implements RetailerInterface
@@ -18,7 +18,7 @@ class AmazonRetailer implements RetailerInterface
 		return 'Amazon';
 	}
 
-	public function checkStock(Product $product): StockCheckResult
+	public function checkStock(ProductInterface $product): StockCheckResult
 	{
 		$shopUrl = 'https://www.amazon.de/dp/' . $product->getAsin();
 
