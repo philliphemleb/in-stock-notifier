@@ -20,7 +20,7 @@ class AmazonRetailer implements RetailerInterface
 
 	public function checkStock(ProductInterface $product): StockCheckResult
 	{
-		$shopUrl = 'https://www.amazon.de/dp/' . $product->getAsin();
+		$shopUrl = 'https://www.amazon.de/dp/' . $product->getIdentifier();
 
 		$response = $this->client->request(
 			'GET',
