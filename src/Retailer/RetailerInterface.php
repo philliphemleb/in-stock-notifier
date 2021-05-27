@@ -12,5 +12,9 @@ interface RetailerInterface
 	 * Returns retailer name. Used for notifications
 	 */
 	public function identifier(): string;
+
+    /**
+     * @throws RetailerException
+     */
     public function checkStock(Product $product): StockCheckResult;
 }

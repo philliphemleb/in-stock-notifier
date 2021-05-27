@@ -6,6 +6,7 @@ namespace App\Command;
 
 use App\Product\ProductRepository;
 use App\Retailer\AmazonRetailer;
+use App\Retailer\RetailerException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -38,7 +39,16 @@ class RunCommand extends Command
 	    foreach ($this->productRepository->all() as $product) {
 	        $this->logger->info('Checking stock for product '. $product->getName());
 
-            $checkResult = $this->amazonRetailer->checkStock($product);
+	        try {
+                $checkResult = $this->amazonRetailer->checkStock($product);
+            } catch (RetailerException $e) {
+	            $this->logger->error(
+	                $e->getMessage(),
+                    ['retailer' => $e->retailer(), 'response' => $e->response()]
+                );
+	            continue;
+            }
+
             if ($checkResult->isInStock()) {
                 $this->logger->info('Product '. $product->getName() .' is in stock!');
                 $notification = (new Notification)
