@@ -6,6 +6,8 @@ namespace App\Product;
 
 use App\Product\Amazon\AmazonIdentifier;
 use App\Product\Amazon\AmazonProduct;
+use App\Product\Mediamarkt\MediamarktIdentifier;
+use App\Product\Mediamarkt\MediamarktProduct;
 
 class ProductRepository
 {
@@ -14,6 +16,8 @@ class ProductRepository
      */
     public function all(): iterable
     {
+    	yield new MediamarktProduct('Playstation 5 Disk Edition', new MediamarktIdentifier('_sony-playstation®5-2661938.html'));
+
         yield new AmazonProduct('Playstation 5 Digital Edition', new AmazonIdentifier('B08H98GVK8'));
         yield new AmazonProduct('Playstation 5 Disk Edition', new AmazonIdentifier('B08H93ZRK9'));
 

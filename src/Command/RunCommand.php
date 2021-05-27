@@ -4,8 +4,11 @@ declare(strict_types=1);
 namespace App\Command;
 
 
+use App\Product\Amazon\AmazonProduct;
+use App\Product\Mediamarkt\MediamarktProduct;
 use App\Product\ProductRepository;
 use App\Retailer\AmazonRetailer;
+use App\Retailer\MediamarktRetailer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,6 +22,7 @@ class RunCommand extends Command
 	public function __construct(
 	    private ProductRepository $productRepository,
 		private AmazonRetailer $amazonRetailer,
+		private MediamarktRetailer $mediamarktRetailer,
 		private NotifierInterface $notifier,
         private LoggerInterface $logger
 	)
@@ -33,12 +37,27 @@ class RunCommand extends Command
 			->setDescription('Run the application');
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 	    foreach ($this->productRepository->all() as $product) {
 	        $this->logger->info('Checking stock for product '. $product->getName());
 
-            $checkResult = $this->amazonRetailer->checkStock($product);
+	        if ($product instanceof AmazonProduct)
+	        {
+	        	$checkResult = $this->amazonRetailer->checkStock($product);
+	        } else if ($product instanceof MediamarktProduct)
+	        {
+	        	$checkResult = $this->mediamarktRetailer->checkStock($product);
+	        } else
+	        {
+		        $this->logger->error('Retailer not found ['. $product::class .']');
+		        continue;
+	        }
+
+
             if ($checkResult->isInStock()) {
                 $this->logger->info('Product '. $product->getName() .' is in stock!');
                 $notification = (new Notification)
