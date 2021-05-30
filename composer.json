@@ -16,6 +16,7 @@
         "symfony/framework-bundle": "5.2.*",
         "symfony/http-client": "5.2.*",
         "symfony/notifier": "5.2.*",
+        "symfony/panther": "^1.0",
         "symfony/yaml": "5.2.*"
     },
     "require-dev": {
