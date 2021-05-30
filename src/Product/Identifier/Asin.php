@@ -1,12 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Product\Amazon;
+namespace App\Product\Identifier;
 
-
-use App\Product\IdentifierInterface;
-
-class AmazonIdentifier implements IdentifierInterface
+class Asin implements IdentifierInterface
 {
     public function __construct(
         private string $asin

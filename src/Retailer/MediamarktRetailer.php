@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Retailer;
 
 
-use App\Product\ProductInterface;
+use App\Product\Product;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class MediamarktRetailer implements RetailerInterface
@@ -18,24 +18,13 @@ class MediamarktRetailer implements RetailerInterface
 		return 'Mediamarkt';
 	}
 
-	public function checkStock(ProductInterface $product): StockCheckResult
+	public function checkStock(Product $product): StockCheckResult
 	{
-		$shopUrl = 'https://www.mediamarkt.de/de/product/' . $product->getIdentifier();
+		if ($product->getMediamarktId() === null) { return new StockCheckResult(false, $this,'https://www.mediamarkt.de/de/product/'); }
 
-		$response = $this->client->request(
-			'GET',
-			$shopUrl,
-			[
-				'headers' => [
-					'dnt' => '1',
-					'upgrade-insecure-requests' => '1',
-					'accept' => 'text/html,application/xhtml+xml',
-					'referer' => 'https://www.amazon.com/',
-					'accept-language' => 'de-DE,de;q=0.9',
-					'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'
-				],
-			]
-		);
+		$shopUrl = 'https://www.mediamarkt.de/de/product/' . $product->getMediamarktId();
+
+		$response = $this->client->request('GET', $shopUrl);
 
 		$inStock = str_contains($response->getContent(), 'data-test="mms-delivery-online-availability"');
 		return new StockCheckResult($inStock, $this, $shopUrl);

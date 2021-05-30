@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace App\Command;
 
 
-use App\Product\Amazon\AmazonProduct;
-use App\Product\Mediamarkt\MediamarktProduct;
 use App\Product\ProductRepository;
 use App\Retailer\AmazonRetailer;
 use App\Retailer\MediamarktRetailer;
@@ -45,30 +43,26 @@ class RunCommand extends Command
 	    foreach ($this->productRepository->all() as $product) {
 	        $this->logger->info('Checking stock for product '. $product->getName());
 
-	        if ($product instanceof AmazonProduct)
+	        $checkResults = [
+		        $this->amazonRetailer->checkStock($product),
+		        $this->mediamarktRetailer->checkStock($product),
+	        ];
+
+	        foreach($checkResults as $checkResult)
 	        {
-	        	$checkResult = $this->amazonRetailer->checkStock($product);
-	        } else if ($product instanceof MediamarktProduct)
-	        {
-	        	$checkResult = $this->mediamarktRetailer->checkStock($product);
-	        } else
-	        {
-		        $this->logger->error('Retailer not found ['. $product::class .']');
-		        continue;
+	        	if ($checkResult->isInStock())
+		        {
+			        $this->logger->info('Product '. $product->getName() .' is in stock!');
+			        $notification = (new Notification)
+				        ->subject(sprintf('New Stock! "%s" is in stock again. (%s)-Link: "%s"', $product->getName(), $checkResult->getRetailer()->identifier(), $checkResult->getShopUrl()))
+				        ->channels(['chat/discord']);
+
+			        $this->notifier->send(
+				        $notification,
+				        new NoRecipient()
+			        );
+		        }
 	        }
-
-
-            if ($checkResult->isInStock()) {
-                $this->logger->info('Product '. $product->getName() .' is in stock!');
-                $notification = (new Notification)
-                    ->subject(sprintf('New Stock! "%s" is in stock again. (%s)-Link: "%s"', $product->getName(), $checkResult->getRetailer()->identifier(), $checkResult->getShopUrl()))
-                    ->channels(['chat/discord']);
-
-                $this->notifier->send(
-                    $notification,
-                    new NoRecipient()
-                );
-            }
         }
 
 		return 0;
