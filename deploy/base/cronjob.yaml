@@ -12,5 +12,11 @@ spec:
             - name: service
               image: ghcr.io/philliphemleb/in-stock-notifier/in-stock-notifier:latest
               imagePullPolicy: Always
+              volumeMounts:
+                - mountPath: /tmp
+                  name: tmp-volume
           restartPolicy: OnFailure
           imagePullSecrets: []
+          volumes:
+            - name: tmp-volume
+              emptyDir: { }

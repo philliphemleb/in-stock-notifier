@@ -42,15 +42,25 @@ class RunCommand extends Command
 	        try {
                 $checkResult = $this->amazonRetailer->checkStock($product);
             } catch (RetailerException $e) {
+	            $dump = new \SplFileObject(tempnam(sys_get_temp_dir(), 'amazon_response.html'), 'w');
+	            $headers = $e->response()?->getHeaders(false) ?? [];
 	            $this->logger->error(
 	                <<<LOG
                     Message: {message}
                     Retailer: {retailer}
-                    Response: {responseAsString}
+                    Response:
+                        {responseHeader}
+                    Body dumped to {dumpPath}
                     
                     LOG,
-                    ['message' => $e->getMessage(), 'retailer' => $e->retailer(), 'responseAsString' => var_export($e->response()?->toArray(), true)]
+                    [
+                        'message' => $e->getMessage(),
+                        'retailer' => $e->retailer()->identifier(),
+                        'responseHeader' => join(PHP_EOL . '    ', array_map(fn($header, $value) => $header . ': ' . (join(', ', $value)), array_keys($headers), array_values($headers))),
+                        'dumpPath' => $dump->getPathname(),
+                    ]
                 );
+	            $dump->fwrite($e->response()?->getContent(false));
 	            continue;
             }
 
