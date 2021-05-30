@@ -34,12 +34,13 @@ class AmazonRetailer implements RetailerInterface
                 $shopUrl,
                 [
                     'headers' => [
-                        'dnt' => '1',
-                        'upgrade-insecure-requests' => '1',
-                        'accept' => 'text/html,application/xhtml+xml',
-                        'referer' => 'https://www.amazon.com/',
+                        'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                        'pragma' => 'no-cache',
+                        'Cache-Control' => 'no-cache',
+                        'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15',
                         'accept-language' => 'de-DE,de;q=0.9',
-                        'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'
+                        'Connection' => 'keep-alive',
+                        'referer' => 'https://www.amazon.com/',
                     ],
                 ]
             );
