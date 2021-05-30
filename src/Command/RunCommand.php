@@ -43,8 +43,13 @@ class RunCommand extends Command
                 $checkResult = $this->amazonRetailer->checkStock($product);
             } catch (RetailerException $e) {
 	            $this->logger->error(
-	                $e->getMessage(),
-                    ['retailer' => $e->retailer(), 'response' => $e->response()]
+	                <<<LOG
+                    Message: {message}
+                    Retailer: {retailer}
+                    Response: {responseAsString}
+                    
+                    LOG,
+                    ['message' => $e->getMessage(), 'retailer' => $e->retailer(), 'responseAsString' => var_export($e->response()?->toArray(), true)]
                 );
 	            continue;
             }
