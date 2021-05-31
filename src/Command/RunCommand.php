@@ -14,6 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\NoRecipient;
+use Symfony\Component\Panther\Client;
 
 class RunCommand extends Command
 {
@@ -22,7 +23,8 @@ class RunCommand extends Command
 		private AmazonRetailer $amazonRetailer,
 		private MediamarktRetailer $mediamarktRetailer,
 		private NotifierInterface $notifier,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
+		private Client $client
 	)
 	{
 		parent::__construct();
@@ -40,12 +42,13 @@ class RunCommand extends Command
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
+		$this->client->start();
 	    foreach ($this->productRepository->all() as $product) {
 	        $this->logger->info('Checking stock for product '. $product->getName());
 
 	        $checkResults = [
-		        $this->amazonRetailer->checkStock($product),
-		        $this->mediamarktRetailer->checkStock($product),
+		        $this->amazonRetailer->checkStock($this->client, $product),
+		        $this->mediamarktRetailer->checkStock($this->client, $product),
 	        ];
 
 	        foreach($checkResults as $checkResult)
@@ -64,6 +67,7 @@ class RunCommand extends Command
 		        }
 	        }
         }
+		$this->client->quit();
 
 		return 0;
 	}

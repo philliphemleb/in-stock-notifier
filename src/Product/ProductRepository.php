@@ -14,6 +14,8 @@ class ProductRepository
      */
     public function all(): iterable
     {
+	    //yield new Product('Xbox Series S', new Asin('B087VM5XC6'), new MediamarktId('_microsoft-xbox-series-s-512-gb-2677359.html'));
+
     	yield new Product('Playstation 5 Digital Edition', new Asin('B08H98GVK8'), new MediamarktId('_sony-playstation®5-digital-edition-2661939.html'));
         yield new Product('Playstation 5 Disk Edition', new Asin('B08H93ZRK9'), new MediamarktId('_sony-playstation®5-2661938.html'));
 
