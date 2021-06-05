@@ -15,3 +15,13 @@ patchesJson6902:
         path: /spec/jobTemplate/spec/template/spec/imagePullSecrets/-
         value:
           name: github-registry-philliphemleb
+      - op: add
+        path: /spec/jobTemplate/spec/template/spec/env/-
+        value:
+          name: APP_ENV
+          value: prod
+      - op: add
+        path: /spec/jobTemplate/spec/template/spec/envFrom/-
+        value:
+          secretRef:
+            name: in-stock-notifier-app-secrets
