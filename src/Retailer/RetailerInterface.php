@@ -5,6 +5,7 @@ namespace App\Retailer;
 
 
 use App\Product\Product;
+use Symfony\Component\Panther\Client;
 
 interface RetailerInterface
 {
@@ -12,9 +13,5 @@ interface RetailerInterface
 	 * Returns retailer name. Used for notifications
 	 */
 	public function identifier(): string;
-
-    /**
-     * @throws RetailerException
-     */
-    public function checkStock(Product $product): StockCheckResult;
+    public function checkStock(Client $client, Product $product): StockCheckResult;
 }

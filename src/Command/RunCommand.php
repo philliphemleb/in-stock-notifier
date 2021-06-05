@@ -6,7 +6,7 @@ namespace App\Command;
 
 use App\Product\ProductRepository;
 use App\Retailer\AmazonRetailer;
-use App\Retailer\RetailerException;
+use App\Retailer\MediamarktRetailer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,14 +14,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\NoRecipient;
+use Symfony\Component\Panther\Client;
 
 class RunCommand extends Command
 {
 	public function __construct(
 	    private ProductRepository $productRepository,
 		private AmazonRetailer $amazonRetailer,
+		private MediamarktRetailer $mediamarktRetailer,
 		private NotifierInterface $notifier,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
+		private Client $client
 	)
 	{
 		parent::__construct();
@@ -34,48 +37,37 @@ class RunCommand extends Command
 			->setDescription('Run the application');
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
+		$this->client->start();
 	    foreach ($this->productRepository->all() as $product) {
 	        $this->logger->info('Checking stock for product '. $product->getName());
 
-	        try {
-                $checkResult = $this->amazonRetailer->checkStock($product);
-            } catch (RetailerException $e) {
-	            $dump = new \SplFileObject(tempnam(sys_get_temp_dir(), 'amazon_response.html'), 'w');
-	            $headers = $e->response()?->getHeaders(false) ?? [];
-	            $this->logger->error(
-	                <<<LOG
-                    Message: {message}
-                    Retailer: {retailer}
-                    Response:
-                        {responseHeader}
-                    Body dumped to {dumpPath}
-                    
-                    LOG,
-                    [
-                        'message' => $e->getMessage(),
-                        'retailer' => $e->retailer()->identifier(),
-                        'responseHeader' => join(PHP_EOL . '    ', array_map(fn($header, $value) => $header . ': ' . (join(', ', $value)), array_keys($headers), array_values($headers))),
-                        'dumpPath' => $dump->getPathname(),
-                    ]
-                );
-	            $dump->fwrite($e->response()?->getContent(false));
-	            continue;
-            }
+	        $checkResults = [
+		        $this->amazonRetailer->checkStock($this->client, $product),
+		        $this->mediamarktRetailer->checkStock($this->client, $product),
+	        ];
 
-            if ($checkResult->isInStock()) {
-                $this->logger->info('Product '. $product->getName() .' is in stock!');
-                $notification = (new Notification)
-                    ->subject(sprintf('New Stock! "%s" is in stock again. (%s)-Link: "%s"', $product->getName(), $checkResult->getRetailer()->identifier(), $checkResult->getShopUrl()))
-                    ->channels(['chat/discord']);
+	        foreach($checkResults as $checkResult)
+	        {
+	        	if ($checkResult->isInStock())
+		        {
+			        $this->logger->info('Product '. $product->getName() .' is in stock!');
+			        $notification = (new Notification)
+				        ->subject(sprintf('New Stock! "%s" is in stock again. (%s)-Link: "%s"', $product->getName(), $checkResult->getRetailer()->identifier(), $checkResult->getShopUrl()))
+				        ->channels(['chat/discord']);
 
-                $this->notifier->send(
-                    $notification,
-                    new NoRecipient()
-                );
-            }
+			        $this->notifier->send(
+				        $notification,
+				        new NoRecipient()
+			        );
+		        }
+	        }
         }
+		$this->client->quit();
 
 		return 0;
 	}
