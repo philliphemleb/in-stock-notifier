@@ -15,10 +15,10 @@ spec:
               volumeMounts:
                 - mountPath: /tmp
                   name: tmp-volume
+              env: []
+              envFrom: []
           restartPolicy: OnFailure
           imagePullSecrets: []
           volumes:
             - name: tmp-volume
               emptyDir: { }
-          env: []
-          envFrom: []

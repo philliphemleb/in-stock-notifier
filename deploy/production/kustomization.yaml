@@ -16,12 +16,12 @@ patchesJson6902:
         value:
           name: github-registry-philliphemleb
       - op: add
-        path: /spec/jobTemplate/spec/template/spec/env/-
+        path: /spec/jobTemplate/spec/template/spec/containers/0/env/-
         value:
           name: APP_ENV
           value: prod
       - op: add
-        path: /spec/jobTemplate/spec/template/spec/envFrom/-
+        path: /spec/jobTemplate/spec/template/spec/containers/0/envFrom/-
         value:
           secretRef:
             name: in-stock-notifier-app-secrets
