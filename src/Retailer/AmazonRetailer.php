@@ -9,6 +9,8 @@ use Symfony\Component\Panther\Client;
 
 class AmazonRetailer implements RetailerInterface
 {
+    use TakesScreenshot;
+
 	public function identifier(): string
 	{
 		return 'Amazon';
@@ -21,6 +23,8 @@ class AmazonRetailer implements RetailerInterface
 		$shopUrl = 'https://www.amazon.de/dp/' . $product->getAsin();
 		$crawler = $client->request('GET', $shopUrl);
 		$inStockCheck = str_contains($crawler->html(), 'id="add-to-cart-button"');
+
+		$this->takeScreenshot($client, $product);
 
 		return new StockCheckResult($inStockCheck, $this, $shopUrl);
 	}

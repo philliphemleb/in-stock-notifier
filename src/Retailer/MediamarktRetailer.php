@@ -9,6 +9,8 @@ use Symfony\Component\Panther\Client;
 
 class MediamarktRetailer implements RetailerInterface
 {
+    use TakesScreenshot;
+
 	public function identifier(): string
 	{
 		return 'Mediamarkt';
@@ -21,6 +23,8 @@ class MediamarktRetailer implements RetailerInterface
 		$shopUrl = 'https://www.mediamarkt.de/de/product/' . $product->getMediamarktId();
 		$crawler = $client->request('GET', $shopUrl);
 		$inStockCheck = str_contains($crawler->html(), 'data-test="mms-delivery-online-availability"');
+
+		$this->takeScreenshot($client, $product);
 
 		return new StockCheckResult($inStockCheck, $this, $shopUrl);
 	}
