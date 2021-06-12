@@ -9,21 +9,26 @@
         "php": ">=8.0",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "symfony/console": "5.2.*",
-        "symfony/discord-notifier": "5.2.*",
-        "symfony/dotenv": "5.2.*",
+        "ext-pcntl": "*",
+        "amphp/amp": "^2.5",
+        "amphp/http-server": "^2.1",
+        "sensio/framework-extra-bundle": "^6.1",
+        "symfony/console": "5.3.*",
+        "symfony/discord-notifier": "5.3.*",
+        "symfony/dotenv": "5.3.*",
         "symfony/flex": "^1.3.1",
-        "symfony/framework-bundle": "5.2.*",
-        "symfony/http-client": "5.2.*",
-        "symfony/notifier": "5.2.*",
+        "symfony/framework-bundle": "5.3.*",
+        "symfony/http-client": "5.3.*",
+        "symfony/notifier": "5.3.*",
         "symfony/panther": "^1.0",
-        "symfony/yaml": "5.2.*"
+        "symfony/yaml": "5.3.*"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
-        "symfony/browser-kit": "^5.2",
-        "symfony/css-selector": "^5.2",
-        "symfony/phpunit-bridge": "^5.2"
+        "symfony/browser-kit": "^5.3",
+        "symfony/css-selector": "^5.3",
+        "symfony/maker-bundle": "^1.31",
+        "symfony/phpunit-bridge": "^5.3"
     },
     "config": {
         "optimize-autoloader": true,
@@ -67,7 +72,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "5.2.*"
+            "require": "5.3.*"
         }
     }
 }

@@ -4,27 +4,18 @@ declare(strict_types=1);
 namespace App\Command;
 
 
-use App\Product\ProductRepository;
-use App\Retailer\AmazonRetailer;
-use App\Retailer\MediamarktRetailer;
-use Psr\Log\LoggerInterface;
+use Amp\Loop;
+use App\Events;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Notifier\Notification\Notification;
-use Symfony\Component\Notifier\NotifierInterface;
-use Symfony\Component\Notifier\Recipient\NoRecipient;
-use Symfony\Component\Panther\Client;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class RunCommand extends Command
 {
 	public function __construct(
-	    private ProductRepository $productRepository,
-		private AmazonRetailer $amazonRetailer,
-		private MediamarktRetailer $mediamarktRetailer,
-		private NotifierInterface $notifier,
-        private LoggerInterface $logger,
-		private Client $client
+	    private EventDispatcherInterface $eventDispatcher
 	)
 	{
 		parent::__construct();
@@ -42,33 +33,13 @@ class RunCommand extends Command
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		$this->client->start();
-	    foreach ($this->productRepository->all() as $product) {
-	        $this->logger->info('Checking stock for product '. $product->getName());
+	    Loop::run(function () {
+	        $this->eventDispatcher->dispatch(new Event(), Events::LOOP_START);
 
-	        $checkResults = [
-		        $this->amazonRetailer->checkStock($this->client, $product),
-		        $this->mediamarktRetailer->checkStock($this->client, $product),
-	        ];
-
-	        foreach($checkResults as $checkResult)
-	        {
-	        	if ($checkResult->isInStock())
-		        {
-			        $this->logger->info('Product '. $product->getName() .' is in stock!');
-			        $notification = (new Notification)
-				        ->subject(sprintf('New Stock! "%s" is in stock again. (%s)-Link: "%s"', $product->getName(), $checkResult->getRetailer()->identifier(), $checkResult->getShopUrl()))
-				        ->channels(['chat/discord']);
-
-			        $this->notifier->send(
-				        $notification,
-				        new NoRecipient()
-			        );
-		        }
-	        }
-        }
-		$this->client->quit();
-
-		return 0;
+	        Loop::disable(Loop::onSignal(\SIGINT, function (string $watcherId) {
+                $this->eventDispatcher->dispatch(new Event(), Events::LOOP_START);
+            }));
+        });
+	    return Command::SUCCESS;
 	}
 }
