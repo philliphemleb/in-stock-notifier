@@ -6,11 +6,19 @@ namespace App\Retailer;
 
 class StockCheckResult
 {
+    private ?\SplFileInfo $screenshot = null;
+
 	public function __construct(
 		private bool $inStock,
 		private RetailerInterface $retailer,
 		private string $shopUrl
 	) { }
+
+    public function withScreenshot(\SplFileInfo $screenshot): self
+    {
+        $this->screenshot = $screenshot;
+        return $this;
+    }
 
 	/**
 	 * @return bool
@@ -35,4 +43,9 @@ class StockCheckResult
 	{
 		return $this->shopUrl;
 	}
+
+	public function getScreenshot(): ?\SplFileInfo
+    {
+        return $this->screenshot;
+    }
 }

@@ -24,8 +24,8 @@ class MediamarktRetailer implements RetailerInterface
 		$crawler = $client->request('GET', $shopUrl);
 		$inStockCheck = str_contains($crawler->html(), 'data-test="mms-delivery-online-availability"');
 
-		$this->takeScreenshot($client, $product);
+		$screenshot = $this->takeScreenshot($client, $product);
 
-		return new StockCheckResult($inStockCheck, $this, $shopUrl);
+		return (new StockCheckResult($inStockCheck, $this, $shopUrl))->withScreenshot($screenshot);
 	}
 }

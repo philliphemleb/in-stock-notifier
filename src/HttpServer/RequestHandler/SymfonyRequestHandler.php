@@ -9,12 +9,14 @@ use Amp\Http\Server\RequestHandler;
 use Amp\Http\Server\Response;
 use Amp\Promise;
 use App\Kernel;
+use Psr\Log\LoggerInterface;
 use function Amp\call;
 
 final class SymfonyRequestHandler implements RequestHandler
 {
     public function __construct(
-        private Kernel $kernel
+        private Kernel $kernel,
+        private LoggerInterface $logger
     ) {
     }
 
@@ -31,7 +33,12 @@ final class SymfonyRequestHandler implements RequestHandler
                 $request->getCookies()
             );
 
-            $symfonyResponse = $this->kernel->handle($symfonyRequest);
+            try {
+                $symfonyResponse = $this->kernel->handle($symfonyRequest);
+            } catch (\Throwable $e) {
+                $this->logger->alert(sprintf('Unhandled exception "%s"', $e->getMessage()));
+                throw $e;
+            }
 
             return new Response(
                 $symfonyResponse->getStatusCode(),

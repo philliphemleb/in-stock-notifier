@@ -9,7 +9,7 @@ use Symfony\Component\Panther\Client;
 
 trait TakesScreenshot
 {
-    private function takeScreenshot(Client $client, Product $product)
+    private function takeScreenshot(Client $client, Product $product): \SplFileInfo
     {
         $slugify = static fn(string $text): string => preg_replace('/([-]{2,})/', '-', str_replace([' '], '-', strtolower($text)));
         $filename = tempnam(
@@ -20,5 +20,7 @@ trait TakesScreenshot
         if (property_exists($this, 'logger')) {
             $this->logger->info(sprintf('Took a screenshot from %s for %s, saved to %s', $this->identifier(), $product->getName(), $filename));
         }
+
+        return new \SplFileInfo($filename);
     }
 }
