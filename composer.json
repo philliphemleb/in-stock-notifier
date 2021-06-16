@@ -64,7 +64,7 @@
             "@auto-scripts"
         ],
         "test": "phpunit",
-        "app": "bin/console run"
+        "app": "bin/console crawl"
     },
     "conflict": {
         "symfony/symfony": "*"

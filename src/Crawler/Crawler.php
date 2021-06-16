@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace App\Crawler;
 
-use Amp\Loop;
 use App\Crawler\Event\BeginEvent;
 use App\Crawler\Event\FinishEvent;
 use App\Events;
@@ -11,19 +10,14 @@ use App\Product\ProductRepository;
 use App\Retailer\AmazonRetailer;
 use App\Retailer\MediamarktRetailer;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\NoRecipient;
 use Symfony\Component\Panther\Client;
 
-#[AsEventListener(Events::LOOP_START, 'onLoopStart')]
-#[AsEventListener(Events::LOOP_CANCEL, 'onLoopCancel')]
 final class Crawler
 {
-    private ?string $watcher = null;
-
     public function __construct(
         private ProductRepository $productRepository,
         private AmazonRetailer $amazonRetailer,
@@ -63,21 +57,5 @@ final class Crawler
 
             $this->eventDispatcher->dispatch(new FinishEvent($product, ...$checkResults), Events::CRAWLER_FINISH);
         }
-    }
-
-    public function onLoopStart(): void
-    {
-        Loop::defer([$this, 'crawl']);
-        $this->watcher = Loop::repeat(30 * 1000, [$this, 'crawl']);
-    }
-
-    public function onLoopCancel(): void
-    {
-        if (!$this->watcher) {
-            return;
-        }
-
-        $this->client->quit();
-        Loop::cancel($this->watcher);
     }
 }

@@ -2,16 +2,12 @@
 
 namespace App\Controller;
 
-use App\Crawler\Crawler;
 use App\Crawler\Event\FinishEvent;
-use App\Events;
 use App\Retailer\StockCheckResult;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[AsEventListener(Events::CRAWLER_FINISH, 'onCrawlerFinish')]
 class DashboardController extends AbstractController
 {
     private array $crawlerRuns = [];
